@@ -1,14 +1,13 @@
 package com.vadonmo.message.resp;
 
 public class VoiceMessage extends BaseMessage {
-	// MediaId 是 通过素材管理中的接口上传多媒体文件，得到的id
-	private String MediaId;
+	private Voice Voice;
 
-	public String getMediaId() {
-		return MediaId;
+	public Voice getVoice() {
+		return Voice;
 	}
 
-	public void setMediaId(String mediaId) {
-		MediaId = mediaId;
+	public void setVoice(Voice voice) {
+		Voice = voice;
 	}
 }

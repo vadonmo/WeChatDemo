@@ -1,14 +1,13 @@
 package com.vadonmo.message.resp;
 
 public class ImageMessage extends BaseMessage {
-	// MediaId 是 通过素材管理中的接口上传多媒体文件，得到的id。
-	private String MediaId;
+	private Image Image;
 
-	public String getMediaId() {
-		return MediaId;
+	public Image getImage() {
+		return Image;
 	}
 
-	public void setMediaId(String mediaId) {
-		MediaId = mediaId;
+	public void setImage(Image image) {
+		Image = image;
 	}
 }

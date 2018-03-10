@@ -19,67 +19,68 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 import com.vadonmo.message.resp.Article;
+import com.vadonmo.message.resp.Image;
 import com.vadonmo.message.resp.ImageMessage;
 import com.vadonmo.message.resp.MusicMessage;
 import com.vadonmo.message.resp.NewsMessage;
 import com.vadonmo.message.resp.TextMessage;
 
 public class MessageUtil {
-	
+
 	public static void main(String atgs[]) {
 		ImageMessage imageMessage = new ImageMessage();
 		imageMessage.setToUserName("vadonmo");
 		imageMessage.setFromUserName("vadonmo");
 		imageMessage.setCreateTime(new Date().getTime());
-		imageMessage.setFuncFlag(0);
-		imageMessage.setMsgType(MessageUtil.REQ_MESSAGE_TYPE_IMAGE);
-		imageMessage.setMediaId("8989989");
+		// imageMessage.setFuncFlag(0);
+		imageMessage.setMsgType(MessageUtil.MESSAGE_TYPE_IMAGE);
+		Image image = new Image("343drder");
+		imageMessage.setImage(image);
 		messageToXml(imageMessage);
 	}
-	/**
-	 * 返回消息类型：文本
-	 */
-	public static final String RESP_MESSAGE_TYPE_TEXT = "text";
 
 	/**
-	 * 返回消息类型：音乐
+	 * 文本
 	 */
-	public static final String RESP_MESSAGE_TYPE_MUSIC = "music";
+	public static final String MESSAGE_TYPE_TEXT = "text";
 
 	/**
-	 * 返回消息类型：图文
+	 * 音乐
 	 */
-	public static final String RESP_MESSAGE_TYPE_NEWS = "news";
+	public static final String MESSAGE_TYPE_MUSIC = "music";
 
 	/**
-	 * 请求消息类型：文本
+	 * 图文
 	 */
-	public static final String REQ_MESSAGE_TYPE_TEXT = "text";
+	public static final String MESSAGE_TYPE_NEWS = "news";
+	/**
+	 * 图片
+	 */
+	public static final String MESSAGE_TYPE_IMAGE = "image";
 
 	/**
-	 * 请求消息类型：图片
+	 * 链接
 	 */
-	public static final String REQ_MESSAGE_TYPE_IMAGE = "image";
+	public static final String MESSAGE_TYPE_LINK = "link";
 
 	/**
-	 * 请求消息类型：链接
+	 * 地理位置
 	 */
-	public static final String REQ_MESSAGE_TYPE_LINK = "link";
+	public static final String MESSAGE_TYPE_LOCATION = "location";
 
 	/**
-	 * 请求消息类型：地理位置
+	 * 音频
 	 */
-	public static final String REQ_MESSAGE_TYPE_LOCATION = "location";
+	public static final String MESSAGE_TYPE_VOICE = "voice";
+	/**
+	 * 视频
+	 */
+	public static final String MESSAGE_TYPE_VIDEO = "video";
 
 	/**
-	 * 请求消息类型：音频
+	 * 推送
 	 */
-	public static final String REQ_MESSAGE_TYPE_VOICE = "voice";
-
-	/**
-	 * 请求消息类型：推送
-	 */
-	public static final String REQ_MESSAGE_TYPE_EVENT = "event";
+	public static final String MESSAGE_TYPE_EVENT = "event";
 
 	/**
 	 * 事件类型：subscribe(订阅)
@@ -131,6 +132,7 @@ public class MessageUtil {
 
 	/**
 	 * 文本消息对象转换成xml
+	 * 
 	 * @param <T>
 	 * 
 	 * @param textMessage
@@ -142,6 +144,7 @@ public class MessageUtil {
 		System.out.println(xstream.toXML(t));
 		return xstream.toXML(t);
 	}
+
 	public static String textMessageToXml(TextMessage textMessage) {
 		xstream.alias("xml", textMessage.getClass());
 		return xstream.toXML(textMessage);

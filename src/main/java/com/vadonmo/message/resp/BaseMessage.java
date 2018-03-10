@@ -10,7 +10,7 @@ public class BaseMessage {
 	// 消息类型（text/music/news）
 	private String MsgType;
 	// 位0x0001被标志时，星标刚收到的消息
-	private int FuncFlag;
+	//private int FuncFlag;
 
 	public String getToUserName() {
 		return ToUserName;
@@ -44,11 +44,11 @@ public class BaseMessage {
 		MsgType = msgType;
 	}
 
-	public int getFuncFlag() {
-		return FuncFlag;
-	}
-
-	public void setFuncFlag(int funcFlag) {
-		FuncFlag = funcFlag;
-	}
+//	public int getFuncFlag() {
+//		return FuncFlag;
+//	}
+//
+//	public void setFuncFlag(int funcFlag) {
+//		FuncFlag = funcFlag;
+//	}
 }
