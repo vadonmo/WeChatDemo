@@ -5,7 +5,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.vadonmo.message.resp.BaseMessage;
 import com.vadonmo.message.resp.Image;
 import com.vadonmo.message.resp.ImageMessage;
 import com.vadonmo.message.resp.Music;
