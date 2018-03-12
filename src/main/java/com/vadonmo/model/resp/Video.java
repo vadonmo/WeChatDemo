@@ -1,4 +1,4 @@
-package com.vadonmo.message.resp;
+package com.vadonmo.model.resp;
 
 public class Video {
 	// MediaId 是 通过素材管理中的接口上传多媒体文件，得到的id

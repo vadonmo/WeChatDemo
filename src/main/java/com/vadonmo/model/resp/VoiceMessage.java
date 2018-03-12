@@ -1,4 +1,4 @@
-package com.vadonmo.message.resp;
+package com.vadonmo.model.resp;
 
 public class VoiceMessage extends BaseMessage {
 	private Voice Voice;

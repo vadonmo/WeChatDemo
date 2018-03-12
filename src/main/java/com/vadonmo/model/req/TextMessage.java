@@ -1,4 +1,4 @@
-package com.vadonmo.message.req;
+package com.vadonmo.model.req;
 
 public class TextMessage extends BaseMessage {
 	// 文本消息内容

@@ -1,4 +1,4 @@
-package com.vadonmo.message.resp;
+package com.vadonmo.model.resp;
 
 public class Music {
 	// Title 否 音乐标题
@@ -8,9 +8,9 @@ public class Music {
 	// ThumbMediaId 是 缩略图的媒体id，通过素材管理中的接口上传多媒体文件，得到的id
 	private String Title;
 	private String Description;
-	private String MusicURL;
+	private String MusicUrl;
 	private String HQMusicUrl;
-	private String ThumbNediaId;
+	private String ThumbMediaId;
 
 	public String getTitle() {
 		return Title;
@@ -28,12 +28,12 @@ public class Music {
 		Description = description;
 	}
 
-	public String getMusicURL() {
-		return MusicURL;
+	public String getMusicUrl() {
+		return MusicUrl;
 	}
 
-	public void setMusicURL(String musicURL) {
-		MusicURL = musicURL;
+	public void setMusicUrl(String musicUrl) {
+		MusicUrl = musicUrl;
 	}
 
 	public String getHQMusicUrl() {
@@ -44,11 +44,12 @@ public class Music {
 		HQMusicUrl = hQMusicUrl;
 	}
 
-	public String getThumbNediaId() {
-		return ThumbNediaId;
+	public String getThumbMediaId() {
+		return ThumbMediaId;
 	}
 
-	public void setThumbNediaId(String thumbNediaId) {
-		ThumbNediaId = thumbNediaId;
+	public void setThumbMediaId(String thumbMediaId) {
+		ThumbMediaId = thumbMediaId;
 	}
+
 }

@@ -2,7 +2,6 @@ package com.vadonmo.util;
 
 import java.io.InputStream;
 import java.io.Writer;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +9,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
@@ -18,25 +19,27 @@ import com.thoughtworks.xstream.core.util.QuickWriter;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.io.xml.XppDriver;
-import com.vadonmo.message.resp.Article;
-import com.vadonmo.message.resp.Image;
-import com.vadonmo.message.resp.ImageMessage;
-import com.vadonmo.message.resp.MusicMessage;
-import com.vadonmo.message.resp.NewsMessage;
-import com.vadonmo.message.resp.TextMessage;
+import com.vadonmo.model.resp.Article;
+import com.vadonmo.model.resp.ImageMessage;
+import com.vadonmo.model.resp.MusicMessage;
+import com.vadonmo.model.resp.NewsMessage;
+import com.vadonmo.model.resp.TextMessage;
 
 public class MessageUtil {
 
-	public static void main(String atgs[]) {
-		ImageMessage imageMessage = new ImageMessage();
-		imageMessage.setToUserName("vadonmo");
-		imageMessage.setFromUserName("vadonmo");
-		imageMessage.setCreateTime(new Date().getTime());
-		// imageMessage.setFuncFlag(0);
-		imageMessage.setMsgType(MessageUtil.MESSAGE_TYPE_IMAGE);
-		Image image = new Image("343drder");
-		imageMessage.setImage(image);
-		messageToXml(imageMessage);
+	public static void main(String atgs[]) throws DocumentException {
+		String xml = "<xml><ToUserName><![CDATA[gh_e136c6e50636]]></ToUserName>"
+				+ "<FromUserName><![CDATA[oMgHVjngRipVsoxg6TuX3vz6glDg]]></FromUserName>"
+				+ "<CreateTime>1408090502</CreateTime>" + "<MsgType><![CDATA[event]]></MsgType>"
+				+ "<Event><![CDATA[scancode_push]]></Event>" + "<EventKey><![CDATA[6]]></EventKey>"
+				+ "<ScanCodeInfo><ScanType><![CDATA[qrcode]]></ScanType>" + "<ScanResult><![CDATA[1]]></ScanResult>"
+				+ "</ScanCodeInfo>" + "</xml>";
+		Document document = DocumentHelper.parseText(xml);
+		// 得到xml根元素
+		Element root = document.getRootElement();
+		Map<String, String> map = new HashMap<String, String>();
+		map = getXml(root);
+		System.out.println(map);
 	}
 
 	/**
@@ -96,6 +99,22 @@ public class MessageUtil {
 	 * 事件类型：CLICK(自定义菜单点击事件)
 	 */
 	public static final String EVENT_TYPE_CLICK = "CLICK";
+	/**
+	 * 事件类型：scancode_push(扫码推事件的事件推送)
+	 */
+	public static final String EVENT_TYPE_SCANCODE_PUSH = "scancode_push";
+	/**
+	 * 事件类型：scancode_waitmsg(扫码推事件的事件推送)
+	 */
+	public static final String EVENT_TYPE_SCANCODE_WAITMSG = "scancode_waitmsg";
+	/**
+	 * 事件类型：LOCATION(上报地理位置事件)
+	 */
+	public static final String EVENT_TYPE_LOCATION = "LOCATION";
+	/**
+	 * 事件类型：location_select(弹出地理位置选择器的事件推送)
+	 */
+	public static final String EVENT_TYPE_LOCATION_SELECT = "location_select";
 
 	/**
 	 * 解析微信发来的请求（XML）
@@ -104,29 +123,44 @@ public class MessageUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	@SuppressWarnings("unchecked")
+
 	public static Map<String, String> parseXml(HttpServletRequest request) throws Exception {
 		// 将解析结果存储在HashMap中
 		Map<String, String> map = new HashMap<String, String>();
-
 		// 从request中取得输入流
 		InputStream inputStream = request.getInputStream();
+
 		// 读取输入流
 		SAXReader reader = new SAXReader();
 		Document document = reader.read(inputStream);
 		// 得到xml根元素
 		Element root = document.getRootElement();
-		// 得到根元素的所有子节点
-		List<Element> elementList = root.elements();
-
-		// 遍历所有子节点
-		for (Element e : elementList)
-			map.put(e.getName(), e.getText());
-
+		// List<Element> elementList = root.elements();
+		map = getXml(root);
+		// for (Element element : elementList) {
+		// map.put(element.getName(), element.getText());
+		// }
 		// 释放资源
 		inputStream.close();
 		inputStream = null;
 
+		return map;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static Map<String, String> getXml(Element root) {
+		// 将解析结果存储在HashMap中
+		Map<String, String> map = new HashMap<String, String>();
+		List<Element> elementList = root.elements();
+		for (Element element : elementList) {
+			// 得到当前节点下的节点
+			if (element.nodeCount() > 1) {
+				map.putAll(getXml(element));
+			} else {
+				map.put(element.getName(), element.getText());
+				// System.out.println("name:" + element.getName() + "val:" + element.getText());
+			}
+		}
 		return map;
 	}
 
@@ -141,7 +175,7 @@ public class MessageUtil {
 	 */
 	public static <T> String messageToXml(T t) {
 		xstream.alias("xml", t.getClass());
-		//System.out.println(xstream.toXML(t));
+		// System.out.println(xstream.toXML(t));
 		return xstream.toXML(t);
 	}
 
@@ -191,6 +225,7 @@ public class MessageUtil {
 				// 对所有xml节点的转换都增加CDATA标记
 				boolean cdata = true;
 
+				@SuppressWarnings("rawtypes")
 				public void startNode(String name, Class clazz) {
 					super.startNode(name, clazz);
 				}

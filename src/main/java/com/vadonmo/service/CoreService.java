@@ -5,15 +5,15 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.vadonmo.message.resp.Image;
-import com.vadonmo.message.resp.ImageMessage;
-import com.vadonmo.message.resp.Music;
-import com.vadonmo.message.resp.MusicMessage;
-import com.vadonmo.message.resp.TextMessage;
-import com.vadonmo.message.resp.Video;
-import com.vadonmo.message.resp.VideoMessage;
-import com.vadonmo.message.resp.Voice;
-import com.vadonmo.message.resp.VoiceMessage;
+import com.vadonmo.model.resp.Image;
+import com.vadonmo.model.resp.ImageMessage;
+import com.vadonmo.model.resp.Music;
+import com.vadonmo.model.resp.MusicMessage;
+import com.vadonmo.model.resp.TextMessage;
+import com.vadonmo.model.resp.Video;
+import com.vadonmo.model.resp.VideoMessage;
+import com.vadonmo.model.resp.Voice;
+import com.vadonmo.model.resp.VoiceMessage;
 import com.vadonmo.util.MessageUtil;
 
 public class CoreService {
@@ -31,7 +31,6 @@ public class CoreService {
 
 			// xml请求解析
 			Map<String, String> requestMap = MessageUtil.parseXml(request);
-
 			// 发送方帐号（open_id）
 			String fromUserName = requestMap.get("FromUserName");
 			// 公众帐号
@@ -58,13 +57,28 @@ public class CoreService {
 					musicMessage.setMsgType(MessageUtil.MESSAGE_TYPE_MUSIC);
 					Music music = new Music();
 					music.setDescription("描述");
-					music.setThumbNediaId("1pKpzsA-7vJo-bWCzYrIHZU426kuG7eCp28yrqO4qBi2bKsAUteoaA1_5J1jHfWh");
-					music.setMusicURL("");
+					music.setThumbMediaId("SyfAQWIOwYcMvHdAXSypctU8boIt0rzmr0zwmCqEt-2M1w8JqUsBDwNe9yvm-ba2");
+					music.setMusicUrl("");
 					music.setTitle("標題");
+					music.setHQMusicUrl("");
 					musicMessage.setMusic(music);
 					respMessage = MessageUtil.messageToXml(musicMessage);
 					break;
-				}
+				} /*else if (keyword.equals("视频")) {
+					VideoMessage videoMessage = new VideoMessage();
+					videoMessage.setToUserName(fromUserName);
+					videoMessage.setFromUserName(toUserName);
+					videoMessage.setCreateTime(new Date().getTime());
+					videoMessage.setMsgType(MessageUtil.MESSAGE_TYPE_VIDEO);
+					Video video = new Video();
+					video.setDescription("我是一条小视频描述");
+					video.setMediaId("rtQp6crZWZpnKBSrDdTNgo6K5CAqsd37EE3Vs5nucYfhBZQC4f2HvhRLjo4h9m1r");
+					video.setTitle("我是一条小视频标题");
+					videoMessage.setVideo(video);
+					respMessage = MessageUtil.messageToXml(videoMessage);
+					break;
+				}*/
+
 				respMessage = MessageUtil.messageToXml(textMessage);
 				break;
 			case MessageUtil.MESSAGE_TYPE_IMAGE:
@@ -105,47 +119,75 @@ public class CoreService {
 				break;
 			case MessageUtil.MESSAGE_TYPE_MUSIC:
 				// 回复视频消息
-				
+
 				break;
-			default:
+			case MessageUtil.MESSAGE_TYPE_EVENT:// 事件
+				String eventType = requestMap.get("Event");
+				switch (eventType) {
+				case MessageUtil.EVENT_TYPE_SUBSCRIBE:// 关注
+					textMessage.setContent("感谢关注");
+					respMessage = MessageUtil.messageToXml(textMessage);
+					break;
+				case MessageUtil.EVENT_TYPE_UNSUBSCRIBE:// 取消关注
+					break;
+				case MessageUtil.EVENT_TYPE_CLICK:// 点击事件
+					String eventKey = requestMap.get("EventKey");
+					switch (eventKey) {
+					case "V1001_TODAY_MUSIC":
+						textMessage.setContent("今日歌曲");
+						break;
+					case "V1001_TODAY_SINGER":
+						textMessage.setContent("歌手简介");
+						break;
+					case "V1001_GOOD":
+						textMessage.setContent("赞一下我们");
+						break;
+					default:
+						break;
+					}
+					respMessage = MessageUtil.messageToXml(textMessage);
+					break;
+				case MessageUtil.EVENT_TYPE_SCANCODE_PUSH:
+					respMessage = "success";// MessageUtil.messageToXml(textMessage);
+					break;
+				case MessageUtil.EVENT_TYPE_SCANCODE_WAITMSG:
+					String scanResult = requestMap.get("ScanResult");// 扫描结果
+					textMessage.setContent("扫描结果：\n" + scanResult);
+					respMessage = MessageUtil.messageToXml(textMessage);
+					break;
+				case MessageUtil.EVENT_TYPE_LOCATION:
+					respContent = "上传位置\n经度：" + requestMap.get("Longitude") + "\n纬度：" + requestMap.get("Latitude");
+					textMessage.setContent(respContent);
+					respMessage = "success";
+					break;
+				case MessageUtil.EVENT_TYPE_LOCATION_SELECT:
+					respContent = "弹出选择器发送地址：" + requestMap.get("Poiname") + requestMap.get("Label") + "\n经度："
+							+ requestMap.get("Location_X") + "\n纬度：" + requestMap.get("Location_Y");
+					textMessage.setContent(respContent);
+					respMessage = MessageUtil.messageToXml(textMessage);
+					break;
+
+				default:
+					textMessage.setContent("无事件");
+					respMessage = MessageUtil.messageToXml(textMessage);
+					break;
+				}
+				break;
+			case MessageUtil.MESSAGE_TYPE_LOCATION:
+				respContent = "收到地址：" + requestMap.get("Label") + "\n经度：" + requestMap.get("Location_X") + "\n纬度："
+						+ requestMap.get("Location_Y");
+				textMessage.setContent(respContent);
 				respMessage = MessageUtil.messageToXml(textMessage);
 				break;
+			default:
+				textMessage.setContent(respContent);
+				respMessage = "success";// MessageUtil.messageToXml(textMessage);
+				break;
 			}
-
-			// 回复文本消息
-			/*
-			 * TextMessage textMessage = new TextMessage();
-			 * textMessage.setToUserName(fromUserName);
-			 * textMessage.setFromUserName(toUserName); textMessage.setCreateTime(new
-			 * Date().getTime()); textMessage.setMsgType(MessageUtil.MESSAGE_TYPE_TEXT);
-			 * textMessage.setFuncFlag(0);
-			 * 
-			 * // 文本消息 if (msgType.equals(MessageUtil.MESSAGE_TYPE_TEXT)) { respContent =
-			 * requestMap.get("Content"); } // 图片消息 else if
-			 * (msgType.equals(MessageUtil.MESSAGE_TYPE_IMAGE)) { respContent =
-			 * "您发送的是图片消息！"; } // 地理位置消息 else if
-			 * (msgType.equals(MessageUtil.MESSAGE_TYPE_LOCATION)) { respContent =
-			 * "您发送的是地理位置消息！"; } // 链接消息 else if
-			 * (msgType.equals(MessageUtil.MESSAGE_TYPE_LINK)) { respContent = "您发送的是链接消息！";
-			 * } // 音频消息 else if (msgType.equals(MessageUtil.MESSAGE_TYPE_VOICE)) {
-			 * respContent = "您发送的是音频消息！"; } // 事件推送 else if
-			 * (msgType.equals(MessageUtil.MESSAGE_TYPE_EVENT)) { // 事件类型 String eventType =
-			 * requestMap.get("Event"); // 订阅 if
-			 * (eventType.equals(MessageUtil.EVENT_TYPE_SUBSCRIBE)) { respContent =
-			 * "谢谢您的关注！"; } // 取消订阅 else if
-			 * (eventType.equals(MessageUtil.EVENT_TYPE_UNSUBSCRIBE)) { // TODO
-			 * 取消订阅后用户再收不到公众号发送的消息，因此不需要回复消息 } // 自定义菜单点击事件 else if
-			 * (eventType.equals(MessageUtil.EVENT_TYPE_CLICK)) { // TODO
-			 * 自定义菜单权没有开放，暂不处理该类消息 } }
-			 * 
-			 * textMessage.setContent(respContent); respMessage =
-			 * MessageUtil.messageToXml(textMessage);
-			 */
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return respMessage;
 	}
-	
 }

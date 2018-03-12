@@ -1,4 +1,4 @@
-package com.vadonmo.message.resp;
+package com.vadonmo.model.resp;
 
 public class ImageMessage extends BaseMessage {
 	private Image Image;

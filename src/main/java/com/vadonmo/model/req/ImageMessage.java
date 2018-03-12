@@ -1,4 +1,4 @@
-package com.vadonmo.message.req;
+package com.vadonmo.model.req;
 
 public class ImageMessage extends BaseMessage {
 	// PicUrl 图片链接（由系统生成）

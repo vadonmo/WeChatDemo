@@ -1,4 +1,4 @@
-package com.vadonmo.message.req;
+package com.vadonmo.model.req;
 
 public class VideoMessage extends BaseMessage {
 	// MediaId 视频消息媒体id，可以调用多媒体文件下载接口拉取数据。

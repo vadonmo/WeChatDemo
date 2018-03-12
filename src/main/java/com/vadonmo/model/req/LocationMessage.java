@@ -1,4 +1,4 @@
-package com.vadonmo.message.req;
+package com.vadonmo.model.req;
 
 public class LocationMessage extends BaseMessage {
 //	Location_X	地理位置维度

@@ -1,4 +1,4 @@
-package com.vadonmo.message.req;
+package com.vadonmo.model.req;
 
 public class VoiceMessage extends BaseMessage {
 	// MediaId 语音消息媒体id，可以调用多媒体文件下载接口拉取数据。
