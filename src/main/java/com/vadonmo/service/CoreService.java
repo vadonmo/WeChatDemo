@@ -1,14 +1,20 @@
 package com.vadonmo.service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.vadonmo.model.resp.Article;
 import com.vadonmo.model.resp.Image;
 import com.vadonmo.model.resp.ImageMessage;
 import com.vadonmo.model.resp.Music;
 import com.vadonmo.model.resp.MusicMessage;
+import com.vadonmo.model.resp.NewsMessage;
 import com.vadonmo.model.resp.TextMessage;
 import com.vadonmo.model.resp.Video;
 import com.vadonmo.model.resp.VideoMessage;
@@ -17,6 +23,23 @@ import com.vadonmo.model.resp.VoiceMessage;
 import com.vadonmo.util.MessageUtil;
 
 public class CoreService {
+	public static void main(String args[]) {
+		NewsMessage newsMessage = new NewsMessage();
+
+		List<Article> list = new ArrayList<>();
+		for (int i = 0; i < 5; i++) {
+			Article article = new Article();
+			article.setTitle("我是图文标题" + i);
+			article.setDescription("我是描述" + i);
+			list.add(article);
+		}
+		newsMessage.setCreateTime(new Date().getTime());
+		newsMessage.setMsgType(MessageUtil.MESSAGE_TYPE_NEWS);
+		newsMessage.setArticleCount(list.size());
+		newsMessage.setArticles(list);
+		System.out.println(MessageUtil.newsMessageToXml(newsMessage));
+	}
+
 	/**
 	 * 处理微信发来的请求
 	 * 
@@ -64,22 +87,55 @@ public class CoreService {
 					musicMessage.setMusic(music);
 					respMessage = MessageUtil.messageToXml(musicMessage);
 					break;
-				} /*else if (keyword.equals("视频")) {
-					VideoMessage videoMessage = new VideoMessage();
-					videoMessage.setToUserName(fromUserName);
-					videoMessage.setFromUserName(toUserName);
-					videoMessage.setCreateTime(new Date().getTime());
-					videoMessage.setMsgType(MessageUtil.MESSAGE_TYPE_VIDEO);
-					Video video = new Video();
-					video.setDescription("我是一条小视频描述");
-					video.setMediaId("rtQp6crZWZpnKBSrDdTNgo6K5CAqsd37EE3Vs5nucYfhBZQC4f2HvhRLjo4h9m1r");
-					video.setTitle("我是一条小视频标题");
-					videoMessage.setVideo(video);
-					respMessage = MessageUtil.messageToXml(videoMessage);
-					break;
-				}*/
+				} /*
+					 * else if (keyword.equals("视频")) { VideoMessage videoMessage = new
+					 * VideoMessage(); videoMessage.setToUserName(fromUserName);
+					 * videoMessage.setFromUserName(toUserName); videoMessage.setCreateTime(new
+					 * Date().getTime()); videoMessage.setMsgType(MessageUtil.MESSAGE_TYPE_VIDEO);
+					 * Video video = new Video(); video.setDescription("我是一条小视频描述");
+					 * video.setMediaId(
+					 * "rtQp6crZWZpnKBSrDdTNgo6K5CAqsd37EE3Vs5nucYfhBZQC4f2HvhRLjo4h9m1r");
+					 * video.setTitle("我是一条小视频标题"); videoMessage.setVideo(video); respMessage =
+					 * MessageUtil.messageToXml(videoMessage); break; }
+					 */
+				else if (keyword.startsWith("天气")) {
+					String keywd = keyword.replace("天气", "").trim();
+					String jsonStr = WeatherService.getWeatherInfo(keywd.equals("") ? "ip" : keywd);
+					JSONObject jsonObject = JSONObject.parseObject(jsonStr).getJSONArray("results").getJSONObject(0);
+					JSONObject location = jsonObject.getJSONObject("location");
+					JSONArray daily = jsonObject.getJSONArray("daily");
+					String name = location.getString("name");
+					NewsMessage newsMessage = new NewsMessage();
 
-				respMessage = MessageUtil.messageToXml(textMessage);
+					List<Article> list = new ArrayList<>();
+					Article article = new Article();
+					article.setTitle(name + "未来三天天气预报");
+					article.setPicUrl(
+							"http://mmbiz.qpic.cn/mmbiz_jpg/WythowZsCeh5fYeG8d5aVryKFBWU13g73Yt4ltqGuKZtuwggvSprzuiadTpicaD5X8YhU8VM6FY1HtUJTzuWea0A/0");
+					article.setUrl("");
+					list.add(article);
+					for (int i = 0, len = daily.size(); i < len; i++) {
+						JSONObject object = daily.getJSONObject(i);
+						Article a = new Article();
+						a.setTitle(object.getString("date") + " " + object.getString("high") + "℃~" + object.getString("low")
+								+ "℃ 白天：" + object.getString("text_day") + " 夜间：" + object.getString("text_night")
+								+ object.getString("wind_direction") + "风" + object.getString("wind_scale") + "级");
+						a.setDescription("");
+						a.setPicUrl("http://118.89.231.141/wechat/static/weather/"+ object.getString("code_day") + ".png");
+						a.setUrl("");
+						list.add(a);
+					}
+					newsMessage.setFromUserName(toUserName);
+					newsMessage.setToUserName(fromUserName);
+					newsMessage.setCreateTime(new Date().getTime());
+					newsMessage.setMsgType(MessageUtil.MESSAGE_TYPE_NEWS);
+					newsMessage.setArticleCount(list.size());
+					newsMessage.setArticles(list);
+					respMessage = MessageUtil.newsMessageToXml(newsMessage);
+					break;
+				} else {
+					respMessage = MessageUtil.messageToXml(textMessage);
+				}
 				break;
 			case MessageUtil.MESSAGE_TYPE_IMAGE:
 				// 回复图片消息
