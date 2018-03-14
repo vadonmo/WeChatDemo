@@ -6,15 +6,14 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -23,14 +22,10 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.Args;
-import org.apache.http.util.CharArrayBuffer;
 import org.apache.http.util.EntityUtils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.vadonmo.model.AccessToken;
 import com.vadonmo.model.KfAccount;
 import com.vadonmo.util.Global;
@@ -55,8 +50,194 @@ public class WeixinGateway {
 	private static final String JSAPI_TICKET_GET_URL = API_URL_PREFIX
 			+ "ticket/getticket?access_token=ACCESS_TOKEN&type=jsapi";
 
+	// 用户
+	private static final String USER_INFO_GET_URL = API_URL_PREFIX
+			+ "user/info?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN";
+	private static final String USER_LIST_GET_URL = API_URL_PREFIX
+			+ "user/get?access_token=ACCESS_TOKEN&next_openid=NEXT_OPENID";
+	private static final String USER_INFO_UPDATE_URL = API_URL_PREFIX
+			+ "user/info/updateremark?access_token=ACCESS_TOKEN";
+	private static final String USER_BLACK_LIST_GET_URL = API_URL_PREFIX
+			+ "tags/members/getblacklist?access_token=ACCESS_TOKEN";
+	private static final String USER_BLACK_LIST_ADD_URL = API_URL_PREFIX
+			+ "tags/members/batchblacklist?access_token=ACCESS_TOKEN";
+	private static final String USER_BLACK_LIST_DELETE_URL = API_URL_PREFIX
+			+ "tags/members/batchunblacklist?access_token=ACCESS_TOKEN";
+
 	public static void main(String args[]) throws Exception {
-		getStaticJsapiTiket();
+		// System.out.println(updateUsreRemark("o95c7uLi7DAvQQvIZHf3ql8vI8c8", "王维东"));
+		// System.out.println(getUserInfo("o95c7uLi7DAvQQvIZHf3ql8vI8c8"));
+		// System.out.println(getUserBlackList(""));
+		List<String> openlist = new ArrayList<>();
+		openlist.add("o95c7uLi7DAvQQvIZHf3ql8vI8c8");
+		// openlist.add("sda");
+		// System.out.println(String.join(",", openlist));
+		// openlist.add("");
+		// System.out.println(addUserBlackList(openlist));
+		System.out.println(deleteUserBalckList(openlist));
+	}
+
+	/**
+	 * 取消拉黑
+	 * 
+	 * @param openIds
+	 * @return
+	 * @throws Exception
+	 */
+	public static String deleteUserBalckList(List<String> openIds) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = USER_BLACK_LIST_DELETE_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
+			HttpPost httpPost = new HttpPost(requestUrl);
+			String param = "{\"openid_list\":[" + openIds.toArray().toString() + "]}";
+			httpPost.setEntity(new StringEntity(param, "UTF-8"));
+			CloseableHttpResponse response = httpClient.execute(httpPost);
+			try {
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + jsonStr);
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
+	}
+
+	/**
+	 * 添加黑名单
+	 * 
+	 * @param openIds
+	 * @return
+	 * @throws Exception
+	 */
+	public static String addUserBlackList(List<String> openIds) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = USER_BLACK_LIST_ADD_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
+			HttpPost httpPost = new HttpPost(requestUrl);
+			String param = "{\"openid_list\":[" + openIds.toArray().toString() + "]}";
+			System.out.println("param=======" + param);
+			httpPost.setEntity(new StringEntity(param, "UTF-8"));
+			CloseableHttpResponse response = httpClient.execute(httpPost);
+			try {
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + jsonStr);
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
+	}
+
+	/**
+	 * 获取黑名单列表
+	 * 
+	 * @param openId
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getUserBlackList(String openId) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = USER_BLACK_LIST_GET_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
+			HttpPost httpPost = new HttpPost(requestUrl);
+			String param = "{\"begin_openid\":\"" + openId + "\"}";
+			httpPost.setEntity(new StringEntity(param, "UTF-8"));
+			CloseableHttpResponse response = httpClient.execute(httpPost);
+			try {
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + jsonStr);
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
+	}
+
+	/**
+	 * 修改用户备注
+	 * 
+	 * @param remark
+	 * @return
+	 * @throws Exception
+	 */
+	public static String updateUsreRemark(String openId, String remark) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = USER_INFO_UPDATE_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
+			HttpPost httpPost = new HttpPost(requestUrl);
+			String param = "{\"openid\":\"" + openId + "\",\"remark\":\"" + remark + "\"}";
+			httpPost.setEntity(new StringEntity(param, "UTF-8"));
+			CloseableHttpResponse response = httpClient.execute(httpPost);
+			try {
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + jsonStr);
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
+	}
+
+	/**
+	 * 获取用户列表
+	 * 
+	 * @param string
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getUserList(String next_openid) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = USER_LIST_GET_URL.replace("ACCESS_TOKEN", getStaticAccessToken()).replace("NEXT_OPENID",
+					next_openid);
+			HttpGet httpGet = new HttpGet(requestUrl);
+			CloseableHttpResponse response = httpClient.execute(httpGet);
+			try {
+				HttpEntity entity = response.getEntity();
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + entity.getContent());
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
+	}
+
+	/**
+	 * 获取用户信息
+	 * 
+	 * @param openId
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getUserInfo(String openId) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = USER_INFO_GET_URL.replace("ACCESS_TOKEN", getStaticAccessToken()).replace("OPENID",
+					openId);
+			HttpGet httpGet = new HttpGet(requestUrl);
+			CloseableHttpResponse response = httpClient.execute(httpGet);
+			try {
+				HttpEntity entity = response.getEntity();
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + entity.getContent());
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
 	}
 
 	/**
@@ -68,12 +249,12 @@ public class WeixinGateway {
 	 */
 	public static String createMenu(String menu) throws Exception {
 		System.out.println(menu);
-		CloseableHttpClient httpCilent = HttpClients.createDefault();
+		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
 			String requestUrl = MENU_CREATE_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
 			HttpPost httpPost = new HttpPost(requestUrl);
 			httpPost.setEntity(new StringEntity(menu, "UTF-8"));
-			CloseableHttpResponse response = httpCilent.execute(httpPost);
+			CloseableHttpResponse response = httpClient.execute(httpPost);
 			try {
 				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
 				System.out.println("entity****:" + jsonStr);
@@ -82,7 +263,7 @@ public class WeixinGateway {
 				response.close();
 			}
 		} finally {
-			httpCilent.close();
+			httpClient.close();
 		}
 	}
 
@@ -93,11 +274,11 @@ public class WeixinGateway {
 	 * @throws Exception
 	 */
 	public static String getMenu() throws Exception {
-		CloseableHttpClient httpCilent = HttpClients.createDefault();
+		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
 			String requestUrl = MENU_GET_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
 			HttpGet httpGet = new HttpGet(requestUrl);
-			CloseableHttpResponse response = httpCilent.execute(httpGet);
+			CloseableHttpResponse response = httpClient.execute(httpGet);
 			try {
 				HttpEntity entity = response.getEntity();
 				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
@@ -107,7 +288,7 @@ public class WeixinGateway {
 				response.close();
 			}
 		} finally {
-			httpCilent.close();
+			httpClient.close();
 		}
 	}
 
@@ -118,11 +299,11 @@ public class WeixinGateway {
 	 * @throws Exception
 	 */
 	public static String deleteMenu() throws Exception {
-		CloseableHttpClient httpCilent = HttpClients.createDefault();
+		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
 			String requestUrl = MENU_DELETE_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
 			HttpGet httpGet = new HttpGet(requestUrl);
-			CloseableHttpResponse response = httpCilent.execute(httpGet);
+			CloseableHttpResponse response = httpClient.execute(httpGet);
 			try {
 				HttpEntity entity = response.getEntity();
 				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
@@ -132,7 +313,7 @@ public class WeixinGateway {
 				response.close();
 			}
 		} finally {
-			httpCilent.close();
+			httpClient.close();
 		}
 	}
 
@@ -143,11 +324,11 @@ public class WeixinGateway {
 	 * @throws Exception
 	 */
 	public static String getKfList() throws Exception {
-		CloseableHttpClient httpCilent = HttpClients.createDefault();
+		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
 			String requestUrl = KFACCOUNT_GETLIST_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
 			HttpGet httpGet = new HttpGet(requestUrl);
-			CloseableHttpResponse response = httpCilent.execute(httpGet);
+			CloseableHttpResponse response = httpClient.execute(httpGet);
 			try {
 				HttpEntity entity = response.getEntity();
 				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
@@ -157,7 +338,7 @@ public class WeixinGateway {
 				response.close();
 			}
 		} finally {
-			httpCilent.close();
+			httpClient.close();
 		}
 	}
 
@@ -171,12 +352,12 @@ public class WeixinGateway {
 	public static String addKfAccount(KfAccount kfAccount) throws Exception {
 		System.out.println(kfAccount);
 		String kf = "{\"kf_account\" : \"test1@test\",\"nickname\" : \"客服1\"}";
-		CloseableHttpClient httpCilent = HttpClients.createDefault();
+		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
 			String requestUrl = KFACCOUNT_ADD_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
 			HttpPost httpPost = new HttpPost(requestUrl);
 			httpPost.setEntity(new StringEntity(kf, "UTF-8"));
-			CloseableHttpResponse response = httpCilent.execute(httpPost);
+			CloseableHttpResponse response = httpClient.execute(httpPost);
 			try {
 				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
 				System.out.println("entity****:" + jsonStr);
@@ -185,7 +366,7 @@ public class WeixinGateway {
 				response.close();
 			}
 		} finally {
-			httpCilent.close();
+			httpClient.close();
 		}
 	}
 
@@ -221,7 +402,7 @@ public class WeixinGateway {
 					System.out.println("***生成token的明细***--success---gtoken：" + gtoken);
 					return Global.ACCESS_TOKEN;
 				}
-				
+
 			} else {
 				System.out.println("****token在有效期***返回token的值为：---" + Global.ACCESS_TOKEN);
 				return Global.ACCESS_TOKEN;
@@ -247,11 +428,11 @@ public class WeixinGateway {
 	 * @throws Exception
 	 */
 	private static String getAccessToken() throws Exception {
-		CloseableHttpClient httpCilent = HttpClients.createDefault();
+		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
 			String requestUrl = ACCESS_TOKEN_URL.replace("APPID", Global.APPID).replace("APPSECRET", Global.APPSECRET);
 			HttpGet httpGet = new HttpGet(requestUrl); // 设置响应头信息
-			CloseableHttpResponse response = httpCilent.execute(httpGet);
+			CloseableHttpResponse response = httpClient.execute(httpGet);
 			try {
 				HttpEntity entity = response.getEntity();
 				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
@@ -264,7 +445,7 @@ public class WeixinGateway {
 				response.close();
 			}
 		} finally {
-			httpCilent.close();
+			httpClient.close();
 		}
 	}
 
@@ -314,11 +495,11 @@ public class WeixinGateway {
 	}
 
 	private static String getJsapiTiket() throws Exception {
-		CloseableHttpClient httpCilent = HttpClients.createDefault();
+		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
 			String requestUrl = JSAPI_TICKET_GET_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
 			HttpGet httpGet = new HttpGet(requestUrl); // 设置响应头信息
-			CloseableHttpResponse response = httpCilent.execute(httpGet);
+			CloseableHttpResponse response = httpClient.execute(httpGet);
 			try {
 				HttpEntity entity = response.getEntity();
 				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
@@ -331,7 +512,7 @@ public class WeixinGateway {
 				response.close();
 			}
 		} finally {
-			httpCilent.close();
+			httpClient.close();
 		}
 	}
 
@@ -457,4 +638,5 @@ public class WeixinGateway {
 
 		}
 	}
+
 }

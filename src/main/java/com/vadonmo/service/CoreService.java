@@ -117,11 +117,13 @@ public class CoreService {
 					for (int i = 0, len = daily.size(); i < len; i++) {
 						JSONObject object = daily.getJSONObject(i);
 						Article a = new Article();
-						a.setTitle(object.getString("date") + " " + object.getString("high") + "℃~" + object.getString("low")
-								+ "℃ 白天：" + object.getString("text_day") + " 夜间：" + object.getString("text_night")
-								+ object.getString("wind_direction") + "风" + object.getString("wind_scale") + "级");
+						a.setTitle(object.getString("date") + " " + object.getString("high") + "℃~"
+								+ object.getString("low") + "℃ 白天：" + object.getString("text_day") + " 夜间："
+								+ object.getString("text_night") + object.getString("wind_direction") + "风"
+								+ object.getString("wind_scale") + "级");
 						a.setDescription("");
-						a.setPicUrl("http://118.89.231.141/wechat/static/weather/"+ object.getString("code_day") + ".png");
+						a.setPicUrl(
+								"http://118.89.231.141/wechat/static/weather/" + object.getString("code_day") + ".png");
 						a.setUrl("");
 						list.add(a);
 					}
@@ -132,7 +134,9 @@ public class CoreService {
 					newsMessage.setArticleCount(list.size());
 					newsMessage.setArticles(list);
 					respMessage = MessageUtil.newsMessageToXml(newsMessage);
-					break;
+				} else if (keyword.equals("分享")) {
+					textMessage.setContent("http://vadon.win/wechat/share");
+					respMessage = MessageUtil.messageToXml(textMessage);
 				} else {
 					respMessage = MessageUtil.messageToXml(textMessage);
 				}
@@ -216,7 +220,7 @@ public class CoreService {
 					default:
 						break;
 					}
-					
+
 					break;
 				case MessageUtil.EVENT_TYPE_SCANCODE_PUSH:
 					respMessage = "success";// MessageUtil.messageToXml(textMessage);
