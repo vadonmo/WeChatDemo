@@ -30,6 +30,7 @@ import org.apache.http.util.EntityUtils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.vadonmo.model.AccessToken;
 import com.vadonmo.model.KfAccount;
 import com.vadonmo.util.Global;
@@ -51,8 +52,11 @@ public class WeixinGateway {
 	private static final String KFACCOUNT_GETLIST_URL = API_URL_PREFIX
 			+ "customservice/getkflist?access_token=ACCESS_TOKEN";
 
+	private static final String JSAPI_TICKET_GET_URL = API_URL_PREFIX
+			+ "ticket/getticket?access_token=ACCESS_TOKEN&type=jsapi";
+
 	public static void main(String args[]) throws Exception {
-		getStaticAccessToken();
+		getStaticJsapiTiket();
 	}
 
 	/**
@@ -195,31 +199,31 @@ public class WeixinGateway {
 		if (Global.ACCESS_TOKEN != null) {
 			Long oldtime = Global.ACCESS_TOKEN_UPDATE_TIME;
 			Date oldDate = new Date(oldtime);
-			System.out.println("caoguoming***全局表里token的值---token：" + Global.ACCESS_TOKEN);
+			System.out.println("***全局表里token的值---token：" + Global.ACCESS_TOKEN);
 			Calendar c = Calendar.getInstance();
 			c.setTime(oldDate);
 			c.set(Calendar.HOUR, c.get(Calendar.HOUR) + 2);
 			// 校验时间是否超过
 			if (new Date().getTime() > c.getTimeInMillis()) {
-				System.out.println("caoguoming****更新token的系统时间***---" + new Date().getTime());
-				System.out.println("caoguoming****全局表里token的时间---" + c.getTimeInMillis());
-				System.out.println("caoguoming****更新token前的值--token：---" + Global.ACCESS_TOKEN);
+				System.out.println("****更新token的系统时间***---" + new Date().getTime());
+				System.out.println("****全局表里token的时间---" + c.getTimeInMillis());
+				System.out.println("****更新token前的值--token：---" + Global.ACCESS_TOKEN);
 				String gtoken = getAccessToken();
 				if (gtoken == null) {
 					System.out.println("获取token fail");
 				} else {
 					// 重新录入
-					System.out.println("caoguoming****更新token后的值***token：---" + gtoken);
+					System.out.println("****更新token后的值***token：---" + gtoken);
 					AccessToken accessToken = new Gson().fromJson(gtoken, AccessToken.class);
 					Global.ACCESS_TOKEN = accessToken.getAccess_token();
 					Global.ACCESS_TOKEN_UPDATE_TIME = new Date().getTime();
-					// caoguoming添加生成token的明细----结束--------
-					System.out.println("caoguoming***生成token的明细***--success---gtoken：" + gtoken);
-					gtoken = Global.ACCESS_TOKEN;
+					// 添加生成token的明细----结束--------
+					System.out.println("***生成token的明细***--success---gtoken：" + gtoken);
+					return Global.ACCESS_TOKEN;
 				}
-				return gtoken;
+				
 			} else {
-				System.out.println("caoguoming****token在有效期***返回token的值为：---" + Global.ACCESS_TOKEN);
+				System.out.println("****token在有效期***返回token的值为：---" + Global.ACCESS_TOKEN);
 				return Global.ACCESS_TOKEN;
 			}
 		} else {
@@ -237,7 +241,7 @@ public class WeixinGateway {
 	}
 
 	/**
-	 * 获取accessToken
+	 * 获取服务器accessToken
 	 * 
 	 * @return
 	 * @throws Exception
@@ -264,7 +268,72 @@ public class WeixinGateway {
 		}
 	}
 
-	
+	public static String getStaticJsapiTiket() throws Exception {
+		if (Global.JSAPI_TIKET != null) {
+			Long oldtime = Global.JSAPI_TIKET_UPDATE_TIME;
+			Date oldDate = new Date(oldtime);
+			System.out.println("***全局表里tiket的值---tiket：" + Global.JSAPI_TIKET);
+			Calendar c = Calendar.getInstance();
+			c.setTime(oldDate);
+			c.set(Calendar.HOUR, c.get(Calendar.HOUR) + 2);
+			// 校验时间是否超过
+			if (new Date().getTime() > c.getTimeInMillis()) {
+				System.out.println("****更新tiket的系统时间***---" + new Date().getTime());
+				System.out.println("****全局表里tiket的时间---" + c.getTimeInMillis());
+				System.out.println("****更新tiket前的值--tiket：---" + Global.JSAPI_TIKET);
+				String gtiket = getJsapiTiket();
+				if (gtiket == null) {
+					System.out.println("获取tiket fail");
+				} else {
+					// 重新录入
+					System.out.println("****更新tiket后的值***tiket：---" + gtiket);
+					JSONObject jsonObject = JSONObject.parseObject(gtiket);
+					Global.JSAPI_TIKET = jsonObject.getString("ticket");// .getAccess_token();
+					Global.JSAPI_TIKET_UPDATE_TIME = new Date().getTime();
+					// 添加生成tiket的明细----结束--------
+					System.out.println("***生成tiket的明细***--success---gtiket：" + gtiket);
+					gtiket = Global.JSAPI_TIKET;
+				}
+				return gtiket;
+			} else {
+				System.out.println("****tiket在有效期***返回tiket的值为：---" + Global.JSAPI_TIKET);
+				return Global.JSAPI_TIKET;
+			}
+		} else {
+			String gtiket = getJsapiTiket();
+			if (gtiket == null) {
+				System.out.println("获取tiket fail");
+			} else {
+				JSONObject jsonObject = JSONObject.parseObject(gtiket);
+				Global.JSAPI_TIKET = jsonObject.getString("ticket");// .getAccess_token();
+				Global.JSAPI_TIKET_UPDATE_TIME = new Date().getTime();
+				return Global.JSAPI_TIKET;
+			}
+		}
+		return null;
+	}
+
+	private static String getJsapiTiket() throws Exception {
+		CloseableHttpClient httpCilent = HttpClients.createDefault();
+		try {
+			String requestUrl = JSAPI_TICKET_GET_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
+			HttpGet httpGet = new HttpGet(requestUrl); // 设置响应头信息
+			CloseableHttpResponse response = httpCilent.execute(httpGet);
+			try {
+				HttpEntity entity = response.getEntity();
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + entity.getContent());
+				// 微信返回的报文时GBK，直接使用httpcore解析乱码
+				// String jsonStr = EntityUtils.toString(response.getEntity(),"UTF-8");
+				EntityUtils.consume(entity);
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpCilent.close();
+		}
+	}
 
 	/**
 	 * 这里说下，在上传视频素材的时候，微信说不超过20M，我试了下，超过10M调通的可能性都比较小，建议大家上传视频素材的大小小于10M比交好

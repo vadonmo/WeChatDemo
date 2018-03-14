@@ -14,6 +14,8 @@ import org.apache.http.util.CharArrayBuffer;
 public class Global {
 	public static String ACCESS_TOKEN = "7_9wknxo0NjIUCj4BC2Tz1KAzvAq5u9prRMkaV6YmRYKGl879HGZAJriEFsLSvQq9a4Bs7tGlmz5Nxkxb06IxzKcjpJENfTfPyciUZLZC7ZZhqErfhHLWnAEgO81P1CFbjkEmN6dgbIiDCaTM9SZAaAFAIPQ";
 	public static Long ACCESS_TOKEN_UPDATE_TIME = 1520830699814L;
+	public static String JSAPI_TIKET= "sM4AOVdWfPE4DxkXGEs8VLgbicO6WLNKgC2DS9sUMFHsl9vANtDNGlQb6kB849uGXZuvD9uSV4ATzm7Hu74Rrg";
+	public static Long JSAPI_TIKET_UPDATE_TIME = 1520830699814L;
 	public static String APPID = "wx0b1fe344d1930600";
 	public static String APPSECRET = "cafcd6c58562b968c1bd3215f4a7d06f";
 

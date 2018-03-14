@@ -79,11 +79,11 @@ public class CoreService {
 					musicMessage.setCreateTime(new Date().getTime());
 					musicMessage.setMsgType(MessageUtil.MESSAGE_TYPE_MUSIC);
 					Music music = new Music();
-					music.setDescription("描述");
-					music.setThumbMediaId("SyfAQWIOwYcMvHdAXSypctU8boIt0rzmr0zwmCqEt-2M1w8JqUsBDwNe9yvm-ba2");
-					music.setMusicUrl("");
-					music.setTitle("標題");
-					music.setHQMusicUrl("");
+					music.setDescription("电视剧《加油吧实习生》插曲");
+					music.setThumbMediaId("ikcfcovYde_TXLP5nsKFeTTiFKGkNi-ITgqA9eOZhNPAF16lNGuEf5IohBLaYCTk");
+					music.setMusicUrl("http://118.89.231.141/upload/1.flac");
+					music.setTitle("牛奶咖啡-明天你好");
+					music.setHQMusicUrl("http://118.89.231.141/upload/1.flac");
 					musicMessage.setMusic(music);
 					respMessage = MessageUtil.messageToXml(musicMessage);
 					break;
@@ -191,17 +191,32 @@ public class CoreService {
 					switch (eventKey) {
 					case "V1001_TODAY_MUSIC":
 						textMessage.setContent("今日歌曲");
+						MusicMessage musicMessage = new MusicMessage();
+						musicMessage.setToUserName(fromUserName);
+						musicMessage.setFromUserName(toUserName);
+						musicMessage.setCreateTime(new Date().getTime());
+						musicMessage.setMsgType(MessageUtil.MESSAGE_TYPE_MUSIC);
+						Music music = new Music();
+						music.setDescription("电影《我的少女时代》主题曲");
+						music.setThumbMediaId("ikcfcovYde_TXLP5nsKFeTTiFKGkNi-ITgqA9eOZhNPAF16lNGuEf5IohBLaYCTk");
+						music.setMusicUrl("http://118.89.231.141/upload/xxy.mp3");
+						music.setTitle("小幸运");
+						music.setHQMusicUrl("http://118.89.231.141/upload/xxy.mp3");
+						musicMessage.setMusic(music);
+						respMessage = MessageUtil.messageToXml(musicMessage);
 						break;
 					case "V1001_TODAY_SINGER":
 						textMessage.setContent("歌手简介");
+						respMessage = MessageUtil.messageToXml(textMessage);
 						break;
 					case "V1001_GOOD":
 						textMessage.setContent("赞一下我们");
+						respMessage = MessageUtil.messageToXml(textMessage);
 						break;
 					default:
 						break;
 					}
-					respMessage = MessageUtil.messageToXml(textMessage);
+					
 					break;
 				case MessageUtil.EVENT_TYPE_SCANCODE_PUSH:
 					respMessage = "success";// MessageUtil.messageToXml(textMessage);
