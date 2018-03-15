@@ -45,10 +45,10 @@ wx.ready(function () {
 	wx.onMenuShareQZone({
 		title: '小幸运-QQ空间',
 		desc: '电影《我的少女时代》主题曲',
-		link: 'http://vadon.win/upload/xxy.mp3',
-		imgUrl: 'http://vadon.win/upload/2.jpg',
+		link: 'http://wechat.qiandaoba.cn/upload/xxy.mp3',
+		imgUrl: 'http://wechat.qiandaoba.cn/upload/2.jpg',
 		type: 'music',
-		dataUrl: 'http://vadon.win/upload/xxy.mp3',
+		dataUrl: 'http://wechat.qiandaoba.cn/upload/xxy.mp3',
 		success: function () {
 			// 用户确认分享后执行的回调函数
 		},
@@ -59,10 +59,10 @@ wx.ready(function () {
 	wx.onMenuShareAppMessage({
 		title: '小幸运-好友',
 		desc: '电影《我的少女时代》主题曲',
-		link: 'http://vadon.win/upload/xxy.mp3',
-		imgUrl: 'http://vadon.win/upload/2.jpg',
+		link: 'http://wechat.qiandaoba.cn/upload/xxy.mp3',
+		imgUrl: 'http://wechat.qiandaoba.cn/upload/2.jpg',
 		type: 'music',
-		dataUrl: 'http://vadon.win/upload/xxy.mp3',
+		dataUrl: 'http://wechat.qiandaoba.cn/upload/xxy.mp3',
 		trigger: function (res) {
 			// 不要尝试在trigger中使用ajax异步请求修改本次分享的内容，因为客户端分享操作是一个同步操作，这时候使用ajax的回包会还没有返回
 			// alert('用户点击发送给朋友');
@@ -81,10 +81,10 @@ wx.ready(function () {
 	wx.onMenuShareTimeline({
 		title: '小幸运-朋友圈',
 		desc: '电影《我的少女时代》主题曲',
-		link: 'http://vadon.win/upload/xxy.mp3',
-		imgUrl: 'http://vadon.win/upload/2.jpg',
+		link: 'http://wechat.qiandaoba.cn/upload/xxy.mp3',
+		imgUrl: 'http://wechat.qiandaoba.cn/upload/2.jpg',
 		type: 'music',
-		dataUrl: 'http://vadon.win/upload/xxy.mp3',
+		dataUrl: 'http://wechat.qiandaoba.cn/upload/xxy.mp3',
 		trigger: function (res) {
 			// 不要尝试在trigger中使用ajax异步请求修改本次分享的内容，因为客户端分享操作是一个同步操作，这时候使用ajax的回包会还没有返回
 			// alert('用户点击分享到朋友圈');
@@ -102,10 +102,10 @@ wx.ready(function () {
 	wx.onMenuShareQQ({
 		title: '小幸运-QQ',
 		desc: '电影《我的少女时代》主题曲',
-		link: 'http://vadon.win/upload/xxy.mp3',
-		imgUrl: 'http://vadon.win/upload/2.jpg',
+		link: 'http://wechat.qiandaoba.cn/upload/xxy.mp3',
+		imgUrl: 'http://wechat.qiandaoba.cn/upload/2.jpg',
 		type: 'music',
-		dataUrl: 'http://vadon.win/upload/xxy.mp3',
+		dataUrl: 'http://wechat.qiandaoba.cn/upload/xxy.mp3',
 		success: function () {
 			// 用户确认分享后执行的回调函数
 		},
@@ -116,10 +116,10 @@ wx.ready(function () {
 	wx.onMenuShareWeibo({
 		title: '小幸运-微博',
 		desc: '电影《我的少女时代》主题曲',
-		link: 'http://vadon.win/upload/xxy.mp3',
-		imgUrl: 'http://vadon.win/upload/2.jpg',
+		link: 'http://wechat.qiandaoba.cn/upload/xxy.mp3',
+		imgUrl: 'http://wechat.qiandaoba.cn/upload/2.jpg',
 		type: 'music',
-		dataUrl: 'http://vadon.win/upload/xxy.mp3',
+		dataUrl: 'http://wechat.qiandaoba.cn/upload/xxy.mp3',
 		success: function () {
 			// 用户确认分享后执行的回调函数
 		},

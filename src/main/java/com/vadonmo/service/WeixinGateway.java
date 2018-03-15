@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -64,17 +63,149 @@ public class WeixinGateway {
 	private static final String USER_BLACK_LIST_DELETE_URL = API_URL_PREFIX
 			+ "tags/members/batchunblacklist?access_token=ACCESS_TOKEN";
 
+	// 素材
+	private static final String MATERIAL_ADD_URL = API_URL_PREFIX + "material/add_material?access_token=ACCESS_TOKEN";
+	private static final String MATERIAL_LIST_GET_URL = API_URL_PREFIX
+			+ "material/batchget_material?access_token=ACCESS_TOKEN";
+	private static final String MATERIAL_DELETE_URL = API_URL_PREFIX
+			+ "material/del_material?access_token=ACCESS_TOKEN";
+
+	// 帐号
+	private static final String QRCODE_CREATE_URL = API_URL_PREFIX + "qrcode/create?access_token=ACCESS_TOKEN";
+	private static final String QRCODE_SHOW_URL = API_URL_PREFIX + "showqrcode?ticket=TICKET";
+
 	public static void main(String args[]) throws Exception {
 		// System.out.println(updateUsreRemark("o95c7uLi7DAvQQvIZHf3ql8vI8c8", "王维东"));
 		// System.out.println(getUserInfo("o95c7uLi7DAvQQvIZHf3ql8vI8c8"));
 		// System.out.println(getUserBlackList(""));
-		List<String> openlist = new ArrayList<>();
-		openlist.add("o95c7uLi7DAvQQvIZHf3ql8vI8c8");
+		// List<String> openlist = new ArrayList<>();
+		// openlist.add("o95c7uLi7DAvQQvIZHf3ql8vI8c8");
 		// openlist.add("sda");
 		// System.out.println(String.join(",", openlist));
 		// openlist.add("");
 		// System.out.println(addUserBlackList(openlist));
-		System.out.println(deleteUserBalckList(openlist));
+		// System.out.println(deleteUserBalckList(openlist));
+		// uploadPermanentMedia2(new File("C:\\Users\\Administrator\\Desktop\\1.jpg"),
+		// "素材标题", "素材描述", "image/jpeg");
+		// System.out.println(getMaterialList("image", 0, 20));
+		System.out.println(createQrCode("QR_LIMIT_SCENE", "test"));
+		System.out.println(new Date().getTime());
+	}
+
+	/**
+	 * c创建二维码
+	 * 
+	 * @param type
+	 *            QR_SCENE:临时二维码 QR_LIMIT_SCENE永久二维码
+	 * @return
+	 * @throws Exception
+	 */
+	public static String createQrCode(String type, String sceneStr) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = QRCODE_CREATE_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
+			HttpPost httpPost = new HttpPost(requestUrl);
+			JSONObject jObject = new JSONObject();
+			// jObject.put("expire_seconds", 604800);不填，则默认有效期为30秒。
+			jObject.put("action_name", type);
+			JSONObject actionInfo = new JSONObject();
+			JSONObject scene = new JSONObject();
+			scene.put("scene_str", sceneStr);
+			actionInfo.put("scene", scene);
+			jObject.put("action_info", actionInfo);
+			System.out.println(jObject.toString());
+			httpPost.setEntity(new StringEntity(jObject.toString(), "UTF-8"));
+			CloseableHttpResponse response = httpClient.execute(httpPost);
+			try {
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				JSONObject result = JSONObject.parseObject(jsonStr);
+				String ticket = result.getString("ticket");
+				showQrCode(ticket);
+				System.out.println("entity****:" + jsonStr);
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
+	}
+
+	public static String showQrCode(String ticket) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = QRCODE_SHOW_URL.replace("TICKET", ticket);
+			HttpGet httpGet = new HttpGet(requestUrl);
+			CloseableHttpResponse response = httpClient.execute(httpGet);
+			try {
+				HttpEntity entity = response.getEntity();
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + entity.getContent());
+				EntityUtils.consume(entity);
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
+	}
+
+	/**
+	 * 删除素材
+	 * 
+	 * @param mediaId
+	 * @return
+	 * @throws Exception
+	 */
+	public static String deleteMaterial(String mediaId) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = MATERIAL_DELETE_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
+			HttpPost httpPost = new HttpPost(requestUrl);
+			JSONObject jObject = new JSONObject();
+			jObject.put("media_id", mediaId);
+			httpPost.setEntity(new StringEntity(jObject.toString(), "UTF-8"));
+			CloseableHttpResponse response = httpClient.execute(httpPost);
+			try {
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + jsonStr);
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
+	}
+
+	/**
+	 * 获取素材列表
+	 * 
+	 * @param type
+	 * @param offset
+	 * @param count
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getMaterialList(String type, int offset, int count) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = MATERIAL_LIST_GET_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
+			HttpPost httpPost = new HttpPost(requestUrl);
+			String param = "{\"type\":\"" + type + "\",\"offset\":" + offset + ",\"count\":" + count + "}";
+			httpPost.setEntity(new StringEntity(param, "UTF-8"));
+			CloseableHttpResponse response = httpClient.execute(httpPost);
+			try {
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + jsonStr);
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
 	}
 
 	/**
@@ -166,7 +297,7 @@ public class WeixinGateway {
 	 * @return
 	 * @throws Exception
 	 */
-	public static String updateUsreRemark(String openId, String remark) throws Exception {
+	public static String updateUserRemark(String openId, String remark) throws Exception {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
 			String requestUrl = USER_INFO_UPDATE_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
@@ -204,6 +335,7 @@ public class WeixinGateway {
 				HttpEntity entity = response.getEntity();
 				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
 				System.out.println("entity****:" + entity.getContent());
+				EntityUtils.consume(entity);
 				return jsonStr;
 			} finally {
 				response.close();
@@ -231,6 +363,7 @@ public class WeixinGateway {
 				HttpEntity entity = response.getEntity();
 				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
 				System.out.println("entity****:" + entity.getContent());
+				EntityUtils.consume(entity);
 				return jsonStr;
 			} finally {
 				response.close();
@@ -283,6 +416,7 @@ public class WeixinGateway {
 				HttpEntity entity = response.getEntity();
 				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
 				System.out.println("entity****:" + entity.getContent());
+				EntityUtils.consume(entity);
 				return jsonStr;
 			} finally {
 				response.close();
@@ -308,6 +442,7 @@ public class WeixinGateway {
 				HttpEntity entity = response.getEntity();
 				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
 				System.out.println("entity****:" + entity.getContent());
+				EntityUtils.consume(entity);
 				return jsonStr;
 			} finally {
 				response.close();
@@ -333,6 +468,7 @@ public class WeixinGateway {
 				HttpEntity entity = response.getEntity();
 				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
 				System.out.println("entity****:" + entity.getContent());
+				EntityUtils.consume(entity);
 				return jsonStr;
 			} finally {
 				response.close();
@@ -526,8 +662,10 @@ public class WeixinGateway {
 	 *            上传类型为video的参数
 	 * @param introduction
 	 *            上传类型为video的参数
+	 * @throws Exception
 	 */
-	public void uploadPermanentMedia2(String accessToken, File file, String title, String introduction) {
+	public static String uploadPermanentMedia2(File file, String title, String introduction, String type)
+			throws Exception {
 		try {
 
 			// 这块是用来处理如果上传的类型是video的类型的
@@ -536,15 +674,15 @@ public class WeixinGateway {
 			j.put("introduction", introduction);
 
 			// 拼装请求地址
-			String uploadMediaUrl = "http://api.weixin.qq.com/cgi-bin/material/add_material?access_token=##ACCESS_TOKEN##";
-			uploadMediaUrl = uploadMediaUrl.replace("##ACCESS_TOKEN##", accessToken);
+			String uploadMediaUrl = MATERIAL_ADD_URL.replace("##ACCESS_TOKEN##", getStaticAccessToken());
 
 			URL url = new URL(uploadMediaUrl);
 			String result = null;
 			long filelength = file.length();
 			String fileName = file.getName();
-			String suffix = fileName.substring(fileName.lastIndexOf("."), fileName.length());
-			String type = "video/mp4"; // 我这里写死
+			// String suffix = fileName.substring(fileName.lastIndexOf("."),
+			// fileName.length()).toLowerCase();
+			// String type = "video/mp4"; // 我这里写死
 			/**
 			 * 你们需要在这里根据文件后缀suffix将type的值设置成对应的mime类型的值
 			 */
@@ -632,11 +770,13 @@ public class WeixinGateway {
 				System.out.println(jsonObject.toString());
 			}
 			System.out.println("json:" + jsonObject.toString());
+			return jsonObject.toString();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
 
 		}
+		return "上传失败";
 	}
 
 }
