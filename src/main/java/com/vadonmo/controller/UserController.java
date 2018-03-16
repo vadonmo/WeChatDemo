@@ -1,5 +1,10 @@
 package com.vadonmo.controller;
 
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -68,5 +73,53 @@ public class UserController {
 		String user = WeixinGateway.getUserBlackList("");
 		model.addAttribute("user", user);
 		return "user";
+	}
+
+	/**
+	 * 获取用户增减数据
+	 * 
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping("getSummary")
+	protected void getUserSummary(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		calendar.add(Calendar.DAY_OF_MONTH, -1);
+		String endDate = sdf.format(calendar.getTime());
+		calendar.add(Calendar.DAY_OF_MONTH, -6);
+		String startDate = sdf.format(calendar.getTime());
+		String user = WeixinGateway.getUserSummary(startDate, endDate);
+		PrintWriter out = response.getWriter();
+		out.print(user);
+		out.close();
+	}
+
+	/**
+	 * 获取累计用户数据
+	 * 
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping("getCumulate")
+	protected void getUserCumulate(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		calendar.add(Calendar.DAY_OF_MONTH, -1);
+		String endDate = sdf.format(calendar.getTime());
+		calendar.add(Calendar.DAY_OF_MONTH, -6);
+		String startDate = sdf.format(calendar.getTime());
+		String user = WeixinGateway.getUserCumulate(startDate, endDate);
+		PrintWriter out = response.getWriter();
+		out.print(user);
+		out.close();
 	}
 }

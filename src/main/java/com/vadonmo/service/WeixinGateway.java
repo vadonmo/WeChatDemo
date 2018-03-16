@@ -63,6 +63,25 @@ public class WeixinGateway {
 	private static final String USER_BLACK_LIST_DELETE_URL = API_URL_PREFIX
 			+ "tags/members/batchunblacklist?access_token=ACCESS_TOKEN";
 
+	// 用户分析
+	private static final String DATACUBE_USER_SUMMARY_URL = API_BASE_URL_PREFIX
+			+ "datacube/getusersummary?access_token=ACCESS_TOKEN";
+	private static final String DATACUBE_USER_CUMULATE_URL = API_BASE_URL_PREFIX
+			+ "datacube/getusercumulate?access_token=ACCESS_TOKEN";
+	// 图文分析
+	private static final String DATACUBE_ARTICLES_SUMMARY_URL = API_BASE_URL_PREFIX
+			+ "datacube/getarticlesummary?access_token=ACCESS_TOKEN";
+	private static final String DATACUBE_ARTICLES_TOTAL_URL = API_BASE_URL_PREFIX
+			+ "getarticletotal?access_token=ACCESS_TOKEN";
+	private static final String DATACUBE_USER_READ_URL = API_BASE_URL_PREFIX
+			+ "datacube/getuserread?access_token=ACCESS_TOKEN";
+	private static final String DATACUBE_USER_READ_HOUR_URL = API_BASE_URL_PREFIX
+			+ "datacube/getuserreadhour?access_token=ACCESS_TOKEN";
+	private static final String DATACUBE_USER_SHARE_URL = API_BASE_URL_PREFIX
+			+ "datacube/getusershare?access_token=ACCESS_TOKEN";
+	private static final String DATACUBE_USER_SHARE_HOUR_URL = API_BASE_URL_PREFIX
+			+ "datacube/getuserSHAREhour?access_token=ACCESS_TOKEN";
+
 	// 素材
 	private static final String MATERIAL_ADD_URL = API_URL_PREFIX + "material/add_material?access_token=ACCESS_TOKEN";
 	private static final String MATERIAL_LIST_GET_URL = API_URL_PREFIX
@@ -88,8 +107,257 @@ public class WeixinGateway {
 		// uploadPermanentMedia2(new File("C:\\Users\\Administrator\\Desktop\\1.jpg"),
 		// "素材标题", "素材描述", "image/jpeg");
 		// System.out.println(getMaterialList("image", 0, 20));
-		System.out.println(createQrCode("QR_LIMIT_SCENE", "test"));
+		// System.out.println(createQrCode("QR_LIMIT_SCENE", "test"));
+		System.out.println(getUserSummary("2018-03-10", "2018-03-15"));
 		System.out.println(new Date().getTime());
+	}
+
+	/**
+	 * 获取图文分享转发数据 7天
+	 * 
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getUserSare(String beginDate, String endDate) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = DATACUBE_USER_SHARE_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
+			HttpPost httpPost = new HttpPost(requestUrl);
+			JSONObject jObject = new JSONObject();
+			jObject.put("begin_date", beginDate);
+			jObject.put("end_date", endDate);
+			System.out.println(jObject.toString());
+			httpPost.setEntity(new StringEntity(jObject.toString(), "UTF-8"));
+			CloseableHttpResponse response = httpClient.execute(httpPost);
+			try {
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + jsonStr);
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
+	}
+
+	/**
+	 * 获取图文分享转发分时数据 1天
+	 * 
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getUserShareHour(String date) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = DATACUBE_USER_SHARE_HOUR_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
+			HttpPost httpPost = new HttpPost(requestUrl);
+			JSONObject jObject = new JSONObject();
+			jObject.put("begin_date", date);
+			jObject.put("end_date", date);
+			System.out.println(jObject.toString());
+			httpPost.setEntity(new StringEntity(jObject.toString(), "UTF-8"));
+			CloseableHttpResponse response = httpClient.execute(httpPost);
+			try {
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + jsonStr);
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
+	}
+
+	/**
+	 * 获取图文统计分时数据 1天
+	 * 
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getUserReadHour(String date) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = DATACUBE_USER_READ_HOUR_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
+			HttpPost httpPost = new HttpPost(requestUrl);
+			JSONObject jObject = new JSONObject();
+			jObject.put("begin_date", date);
+			jObject.put("end_date", date);
+			System.out.println(jObject.toString());
+			httpPost.setEntity(new StringEntity(jObject.toString(), "UTF-8"));
+			CloseableHttpResponse response = httpClient.execute(httpPost);
+			try {
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + jsonStr);
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
+	}
+
+	/**
+	 * 获取图文统计数据 3天
+	 * 
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getUserRead(String beginDate, String endDate) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = DATACUBE_USER_READ_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
+			HttpPost httpPost = new HttpPost(requestUrl);
+			JSONObject jObject = new JSONObject();
+			jObject.put("begin_date", beginDate);
+			jObject.put("end_date", endDate);
+			System.out.println(jObject.toString());
+			httpPost.setEntity(new StringEntity(jObject.toString(), "UTF-8"));
+			CloseableHttpResponse response = httpClient.execute(httpPost);
+			try {
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + jsonStr);
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
+	}
+
+	/**
+	 * 获取图文群发总数据 1天
+	 * 
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getArticleTotal(String date) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = DATACUBE_ARTICLES_TOTAL_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
+			HttpPost httpPost = new HttpPost(requestUrl);
+			JSONObject jObject = new JSONObject();
+			jObject.put("begin_date", date);
+			jObject.put("end_date", date);
+			System.out.println(jObject.toString());
+			httpPost.setEntity(new StringEntity(jObject.toString(), "UTF-8"));
+			CloseableHttpResponse response = httpClient.execute(httpPost);
+			try {
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + jsonStr);
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
+	}
+
+	/**
+	 * 获取图文群发每日数据 1天
+	 * 
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getArticleSummary(String date) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = DATACUBE_ARTICLES_SUMMARY_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
+			HttpPost httpPost = new HttpPost(requestUrl);
+			JSONObject jObject = new JSONObject();
+			jObject.put("begin_date", date);
+			jObject.put("end_date", date);
+			System.out.println(jObject.toString());
+			httpPost.setEntity(new StringEntity(jObject.toString(), "UTF-8"));
+			CloseableHttpResponse response = httpClient.execute(httpPost);
+			try {
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + jsonStr);
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
+	}
+
+	/**
+	 * 获取用户增减数据 7天
+	 * 
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getUserSummary(String beginDate, String endDate) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = DATACUBE_USER_SUMMARY_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
+			HttpPost httpPost = new HttpPost(requestUrl);
+			JSONObject jObject = new JSONObject();
+			jObject.put("begin_date", beginDate);
+			jObject.put("end_date", endDate);
+			System.out.println(jObject.toString());
+			httpPost.setEntity(new StringEntity(jObject.toString(), "UTF-8"));
+			CloseableHttpResponse response = httpClient.execute(httpPost);
+			try {
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + jsonStr);
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
+	}
+
+	/**
+	 * 获取累计用户数据 7天
+	 * 
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getUserCumulate(String beginDate, String endDate) throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = DATACUBE_USER_CUMULATE_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
+			HttpPost httpPost = new HttpPost(requestUrl);
+			JSONObject jObject = new JSONObject();
+			jObject.put("begin_date", beginDate);
+			jObject.put("end_date", endDate);
+			System.out.println(jObject.toString());
+			httpPost.setEntity(new StringEntity(jObject.toString(), "UTF-8"));
+			CloseableHttpResponse response = httpClient.execute(httpPost);
+			try {
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + jsonStr);
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
 	}
 
 	/**
