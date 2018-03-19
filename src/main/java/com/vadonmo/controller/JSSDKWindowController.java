@@ -14,11 +14,10 @@ import com.vadonmo.util.Global;
 import com.vadonmo.util.SignUtil;
 
 @Controller
-@RequestMapping("jssdkImage")
-public class JSSDKImageController {
+@RequestMapping("jssdkWindow")
+public class JSSDKWindowController {
 	@RequestMapping("")
-	protected String getImageInfo(HttpServletResponse response, HttpServletRequest request, Model model)
-			throws Exception {
+	protected String getWindow(HttpServletResponse response, HttpServletRequest request, Model model) throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		String param = request.getQueryString();
@@ -30,7 +29,7 @@ public class JSSDKImageController {
 		Map<String, String> map = SignUtil.sign(WeixinGateway.getStaticJsapiTiket(), url);
 		model.addAttribute("map", map);
 		model.addAttribute("appId", Global.APPID);
-		return "jssdkImage";
+		return "jssdkWindow";
 	}
 
 }

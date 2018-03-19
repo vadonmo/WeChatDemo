@@ -15,6 +15,8 @@ public class Global {
 	public static final String ABSOLUTE_URL = "/usr/local/tomcat7.0.85/webapps/upload";
 	public static String ACCESS_TOKEN = "_oiiMxK872HCPCp_sU6RoviD7teCzPLOpF9Q-yqPFGS809mvxp0WXg0ovfn29rBZsKOlzVdeROVaiNR4TetTj-bCjUpRpM1C808qfsx-G8o76G-WnJ1hMm40VzUWLqjUWBse4T_G7Nq2wOcQATIHaAHAAPO";
 	public static Long ACCESS_TOKEN_UPDATE_TIME = 1521167844544L;
+	public static String API_TIKET = "bxLdikRXVbTPdHSM05e5u5sUoXNKdvsdshFKA";
+	public static Long API_TIKET_UPDATE_TIME = 1521167844544L;
 	public static String JSAPI_TIKET = "sM4AOVdWfPE4DxkXGEs8VLgbicO6WLNKgC2DS9sUMFHsl9vANtDNGlQb6kB849uGXZuvD9uSV4ATzm7Hu74Rrg";
 	public static Long JSAPI_TIKET_UPDATE_TIME = 1520830699814L;
 	public static String APPID = "wx0b1fe344d1930600";

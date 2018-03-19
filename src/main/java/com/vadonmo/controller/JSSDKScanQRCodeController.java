@@ -14,10 +14,10 @@ import com.vadonmo.util.Global;
 import com.vadonmo.util.SignUtil;
 
 @Controller
-@RequestMapping("jssdkImage")
-public class JSSDKImageController {
+@RequestMapping("jssdkScanQRCode")
+public class JSSDKScanQRCodeController {
 	@RequestMapping("")
-	protected String getImageInfo(HttpServletResponse response, HttpServletRequest request, Model model)
+	protected String getScanQRCode(HttpServletResponse response, HttpServletRequest request, Model model)
 			throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
@@ -30,7 +30,7 @@ public class JSSDKImageController {
 		Map<String, String> map = SignUtil.sign(WeixinGateway.getStaticJsapiTiket(), url);
 		model.addAttribute("map", map);
 		model.addAttribute("appId", Global.APPID);
-		return "jssdkImage";
+		return "jssdkScanQRCode";
 	}
 
 }

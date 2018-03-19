@@ -48,6 +48,8 @@ public class WeixinGateway {
 
 	private static final String JSAPI_TICKET_GET_URL = API_URL_PREFIX
 			+ "ticket/getticket?access_token=ACCESS_TOKEN&type=jsapi";
+	private static final String API_TICKET_GET_URL = API_URL_PREFIX
+			+ "ticket/getticket?access_token=ACCESS_TOKEN&type=wx_card";
 
 	// 用户
 	private static final String USER_INFO_GET_URL = API_URL_PREFIX
@@ -902,6 +904,73 @@ public class WeixinGateway {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
 			String requestUrl = JSAPI_TICKET_GET_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
+			HttpGet httpGet = new HttpGet(requestUrl); // 设置响应头信息
+			CloseableHttpResponse response = httpClient.execute(httpGet);
+			try {
+				HttpEntity entity = response.getEntity();
+				String jsonStr = Global.toStringInfo(response.getEntity(), "UTF-8");
+				System.out.println("entity****:" + entity.getContent());
+				// 微信返回的报文时GBK，直接使用httpcore解析乱码
+				// String jsonStr = EntityUtils.toString(response.getEntity(),"UTF-8");
+				EntityUtils.consume(entity);
+				return jsonStr;
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpClient.close();
+		}
+	}
+
+	public static String getStaticApiTiket() throws Exception {
+		if (Global.API_TIKET != null) {
+			Long oldtime = Global.API_TIKET_UPDATE_TIME;
+			Date oldDate = new Date(oldtime);
+			System.out.println("***全局表里tiket的值---tiket：" + Global.API_TIKET);
+			Calendar c = Calendar.getInstance();
+			c.setTime(oldDate);
+			c.set(Calendar.HOUR, c.get(Calendar.HOUR) + 2);
+			// 校验时间是否超过
+			if (new Date().getTime() > c.getTimeInMillis()) {
+				System.out.println("****更新tiket的系统时间***---" + new Date().getTime());
+				System.out.println("****全局表里tiket的时间---" + c.getTimeInMillis());
+				System.out.println("****更新tiket前的值--tiket：---" + Global.API_TIKET);
+				String gtiket = getApiTiket();
+				if (gtiket == null) {
+					System.out.println("获取tiket fail");
+				} else {
+					// 重新录入
+					System.out.println("****更新tiket后的值***tiket：---" + gtiket);
+					JSONObject jsonObject = JSONObject.parseObject(gtiket);
+					Global.API_TIKET = jsonObject.getString("ticket");// .getAccess_token();
+					Global.API_TIKET_UPDATE_TIME = new Date().getTime();
+					// 添加生成tiket的明细----结束--------
+					System.out.println("***生成tiket的明细***--success---gtiket：" + gtiket);
+					gtiket = Global.API_TIKET;
+				}
+				return gtiket;
+			} else {
+				System.out.println("****tiket在有效期***返回tiket的值为：---" + Global.API_TIKET);
+				return Global.API_TIKET;
+			}
+		} else {
+			String gtiket = getApiTiket();
+			if (gtiket == null) {
+				System.out.println("获取tiket fail");
+			} else {
+				JSONObject jsonObject = JSONObject.parseObject(gtiket);
+				Global.API_TIKET = jsonObject.getString("ticket");// .getAccess_token();
+				Global.API_TIKET_UPDATE_TIME = new Date().getTime();
+				return Global.API_TIKET;
+			}
+		}
+		return null;
+	}
+
+	private static String getApiTiket() throws Exception {
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			String requestUrl = API_TICKET_GET_URL.replace("ACCESS_TOKEN", getStaticAccessToken());
 			HttpGet httpGet = new HttpGet(requestUrl); // 设置响应头信息
 			CloseableHttpResponse response = httpClient.execute(httpGet);
 			try {
